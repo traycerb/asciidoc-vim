@@ -13,6 +13,12 @@ au BufNewFile,BufRead *.txt
     \ elseif exists("g:asciidoc_txt_guess") |
     \   call s:FTasciidoc() |
     \ endif
+au BufNewFile,BufRead README,TODO,NOTES,CHANGELOG
+    \ if exists("g:asciidoc_common_force") |
+    \   set filetype=asciidoc |
+    \ elseif exists("g:asciidoc_common_guess") |
+    \   call s:FTasciidoc() |
+    \ endif
 
 " This function checks for a valid AsciiDoc document title after first
 " skipping any leading comments.
