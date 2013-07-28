@@ -8,7 +8,8 @@ CONTENTS                                                   *asciidoc-contents*
     3.Installing........................................|AsciiDocInstalling|
     4.Testing...........................................|AsciiDocTesting|
     5.Known Shortcomings................................|AsciiDocKnownShortcomings|
-    6.Feedback..........................................|AsciiDocFeedback|
+    6.Settings..........................................|AsciiDocSettings|
+    7.Feedback..........................................|AsciiDocFeedback|
 
 
 ==============================================================================
@@ -76,6 +77,28 @@ Some asciidoc syntax is not implemented ?~
 
 Yes, certain newer syntax rules have not been implemented yet, as is the case
 with the upstream version.
+
+==============================================================================
+SETTINGS                                                     *AsciiDocSettings*
+
+*g:asciidoc_txt_force*
+  
+  Will automatically set the syntax of `*.txt` files as 'asciidoc'
+
+*g:asciidoc_txt_guess*
+
+  Will perform a simple test for `*.txt` files and set syntax as 'asciidoc' if
+
+*g:asciidoc_common_force*
+
+  Will automatically set the syntax as 'asciidoc' for files with common names:
+  README, TODO, CHANGELOG, NOTES
+
+*g:asciidoc_common_guess*
+  
+  Will perform a simple test for files with common names and set syntax as
+  'asciidoc' if the file looks like asciidoc
+
 
 ==============================================================================
 FEEDBACK                                                     *AsciiDocFeedback*
