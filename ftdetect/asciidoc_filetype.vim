@@ -6,23 +6,13 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-au BufNewFile,BufRead *.asc,*.asciidoc setfiletype asciidoc
-
-if exists("g:asciidoc_txt_force")
-  au BufNewFile,BufRead *.txt setfiletype asciidoc
-else
-  if exists("g:asciidoc_txt_guess")
-    au BufNewFile,BufRead *.txt call s:FTasciidoc()
-  endif
-endif
-
-if exists("g:asciidoc_common_force")
-  au BufNewFile,BufRead README,TODO,CHANGELOG,NOTES  setfiletype asciidoc
-else
-  if exists("g:asciidoc_common_guess")
-    au BufRead README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
-  endif
-endif
+au BufNewFile,BufRead *.asc,*.asciidoc set filetype=asciidoc
+au BufNewFile,BufRead *.txt
+    \ if exists("g:asciidoc_txt_force") |
+    \   set filetype=asciidoc |
+    \ elseif exists("g:asciidoc_txt_guess") |
+    \   call s:FTasciidoc() |
+    \ endif
 
 " This function checks for a valid AsciiDoc document title after first
 " skipping any leading comments.
@@ -47,18 +37,10 @@ function! s:FTasciidoc()
       break
     endif
   endwhile
-  if line !~ '.\{3,}'
+  if line !~ '^=\{1,5}\s\+\S.*$'
     return
   endif
-  let len = len(line)
-  let line = getline(n)
-  if line !~ '[-=]\{3,}'
-    return
-  endif
-  if len < len(line) - 3 || len > len(line) + 3
-    return
-  endif
-  setfiletype asciidoc
+  set filetype=asciidoc
 endfunction
 
 " vim: et sw=2 ts=2 sts=2:
