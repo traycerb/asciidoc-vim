@@ -6,12 +6,23 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-" COMMENT OUT ONE OF THE TWO FOLLOWING COMMANDS
-" The first sets asciidoc syntax highlighting on all .txt files, the second
-" only existing files *.txt that appear to be AsciiDoc files.
+au BufNewFile,BufRead *.asc,*.asciidoc setfiletype asciidoc
 
-au BufNewFile,BufRead *.txt,README,TODO,CHANGELOG,NOTES  setfiletype asciidoc
-"au BufRead *.txt,README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
+if exists("g:asciidoc_txt_force")
+  au BufNewFile,BufRead *.txt setfiletype asciidoc
+else
+  if exists("g:asciidoc_txt_guess")
+    au BufNewFile,BufRead *.txt call s:FTasciidoc()
+  endif
+endif
+
+if exists("g:asciidoc_common_force")
+  au BufNewFile,BufRead README,TODO,CHANGELOG,NOTES  setfiletype asciidoc
+else
+  if exists("g:asciidoc_common_guess")
+    au BufRead README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
+  endif
+endif
 
 " This function checks for a valid AsciiDoc document title after first
 " skipping any leading comments.
