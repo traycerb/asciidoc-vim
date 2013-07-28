@@ -1,0 +1,86 @@
+*asciidoc.txt* AsciiDoc syntax highlighting in Vim
+
+==============================================================================
+CONTENTS                                                   *asciidoc-contents*
+    
+    1.About.............................................|AsciiDoc|
+    2.Differences with upstread.........................|AsciiDocDifferences|
+    3.Installing........................................|AsciiDocInstalling|
+    4.Testing...........................................|AsciiDocTesting|
+    5.Known Shortcomings................................|AsciiDocKnownShortcomings|
+    6.Feedback..........................................|AsciiDocFeedback|
+
+
+==============================================================================
+ABOUT                                                               *AsciiDoc*
+
+AsciiDoc syntax highlighting in Vim by Dag Wieers <dag@wieers.com>
+
+
+==============================================================================
+DIFFERENCES WITH UPSTREAM                                 *AsciiDocDifferences*
+
+While this syntax file was independently developed, it was later merged
+with improved regular expressions taken from the upstream syntax file.
+
+ - Bold is *bold*, Emphasize is _italic_
+ - Document title stands out (in bold)
+ - Titles are underlined
+ - Better and more colors facilitate reading and editing
+ - Links and email addresses are underlined
+ - Admonitions look nicer
+
+The reason why this syntax file looks better is because it does not stick
+to the provided styles (that mostly maps to programming languages and
+therefor is pretty limited).
+
+
+==============================================================================
+INSTALLING                                               *AsciiDocInstalling*
+
+Put the _asciidoc.vim_ syntax file in your home directory at
+_~/.vim/syntax/asciidoc.vim_. That should be sufficient to have AsciiDoc
+support in VIM.
+
+
+==============================================================================
+TESTING                                                      *AsciiDocTesting*
+
+The syntax file considers 3 different environments:
+
+ 1. Terminal
+ 2. Color terminal
+ 3. GUI
+
+Each of these have different capabilities and therefor can have different
+definitions. To test each of these on a capable terminal, try:
+>
+ $ TERM=vt100 vim README.txt
+ $ TERM=ansi vim README.txt
+ $ gvim README.txt
+<
+
+==============================================================================
+KNOWN SHORTCOMINGS                                 *AsciiDocKnownShortcomings*
+
+There are a few quirks in the syntax files. Here is an overview:
+
+Underlining titles does not work consistently ?~
+
+There is no way that we can match the length of a title with the length of
+the line under it. Because of that every line preceded by text could
+ambigously be interpreted as either a title or the start of a block. Use
+the wiki-style syntax for titles. (used by this document)
+
+Some asciidoc syntax is not implemented ?~
+
+Yes, certain newer syntax rules have not been implemented yet, as is the case
+with the upstream version.
+
+==============================================================================
+FEEDBACK                                                     *AsciiDocFeedback*
+
+if you have fixes or improvements to the syntax file, please send them to:
+<dag@wieers.com>.
+
+vim:ft=help:et:ts=2:sw=2:sts=2:norl
