@@ -21,8 +21,15 @@ syn sync linebreaks=1
 " Run :help syn-priority to review syntax matching priority.
 syn keyword asciidocToDo TODO FIXME CHECK TEST XXX ZZZ DEPRECATED contained
 syn match asciidocBackslash /\\/
+
+"ID marker for revision info in header.  $Id: text $
 syn region asciidocIdMarker start=/^\$Id:\s/ end=/\s\$$/
+
+"\\ \@<! -> can't lead with '\'
+"<\d\{1,2}> '<' Number (1 or 2) '>'
+"Only within literal block '....'
 syn match asciidocCallout /\\\@<!<\d\{1,2}>/
+
 syn match asciidocListBlockDelimiter /^--$/
 syn match asciidocLineBreak /[ \t]+$/
 syn match asciidocRuler /^'\{3,}$/
@@ -40,12 +47,77 @@ syn match asciidocAttributeRef /\\\@<!{\w\(\w\|-\)*\([=!@#$%?:].*\)\?}/
 
 " As a damage control measure quoted patterns always terminate at a blank
 " line (see 'Limitations' above).
-syn match asciidocQuotedSubscript /\\\@<!\~\S\_.\{-}\(\~\|\n\s*\n\)/
-syn match asciidocQuotedSuperscript /\\\@<!\^\S\_.\{-}\(\^\|\n\s*\n\)/
+syn match asciidocQuotedSubscript /\\\@<!\~\(\~\+$\)\@!\S\_.\{-}\(\~\|\n\s*\n\)/
 
-syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=+\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(+\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
-syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=`\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(`\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
-syn match asciidocQuotedUnconstrainedMonospaced /[\\+]\@<!++\S\_.\{-}\(++\|\n\s*\n\)/
+"\\ \@<! -> zero width assertion NO literal '\'
+"\^ \S \_.\{-}  -> literal '^', (any non Whitespace), any char + EOL (zero or
+"more, non greedy)
+"End with:
+"\(
+"    \^  or -> literal '^' or 2 newlines with optional whitespace inbetween
+"        or \n\s*\n
+"\)
+"\(\^\+$\)\@!  -> zero width which matches if there are NOT only '^' signs
+"until the end of the line.
+syn match asciidocQuotedSuperscript /\\\@<!\^\(\^\+$\)\@!\S\_.\{-}\(\^\|\n\s*\n\)/
+
+"zero width assertion match if following is present:
+" ^ or
+"   or | \t ( or
+"             or . , = - ]
+"+ -> literal plus
+"zero width none of the following: [, <space>, ), \n, \t, ]
+"zero or more (non-greedy) of the following 
+" . or
+"   or \n but not followed by \s* \n
+"\S -> non-whitespace
+"+ -> literal plus
+"zero width assertion match if following is present:
+"| \t) or one of
+"      or one of ],.?!;:=- or
+"                          or $
+"\)
+
+"\(
+"    ^\|[| \t([.,=\-\]]
+"\) \@<= 
+"+
+"\(
+"    [ )\n\t]
+"\) \@!
+"\(
+"    . \| \n
+"    \(
+"       \s* \n
+"    \) \@!
+"\) \{-}
+"\S
+"\(
+"    +
+"    \(
+"        [| \t)[\],.?!;:=\-]\|$
+"    \)
+"    \@=
+"\)
+"
+"For Quoted Monospaced demarcated by '+'
+syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=+\(+\+$\)\@!\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(+\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
+"For Quoted Monospaced demarcated by '`'
+syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=`\(`\+$\)\@!\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(`\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
+
+"[\\+] \@<! > can't start with a literal blackslash and '+'
+"++ \S -> '+'x2 and a non-whitespace character 
+"\_. \{-} -> Any single character or end-of-line, zero or more, non-greedy
+"\( ++ \| \n \s* \n \) end with either '+' x2 or a newline and zero or more white
+"space, and another newline)
+"
+"\(+\+$\)\@!  -> zero width which matches if there are NOT only '+' signs
+"until the end of the line.
+"
+"syn match asciidocQuotedUnconstrainedMonospaced
+"/[\\+]\@<!++\S\_.\{-}\(++\|\n\s*\n\)/
+
+syn match asciidocQuotedUnconstrainedMonospaced /[\\+]\@<!++\(+\+$\)\@!\S\_.\{-}\(++\|\n\s*\n\)/
 
 syn match asciidocQuotedEmphasized /\(^\|[| \t([.,=\-\]]\)\@<=_\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(_\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
 syn match asciidocQuotedEmphasized /\(^\|[| \t([.,=\-\]]\)\@<='\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\('\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
@@ -95,15 +167,42 @@ syn region asciidocPassthroughBlock start="^+\{4,}$" end="^+\{4,}$"
 " the pre version 8.2.7 syntax and may be removed in future releases.
 syn region asciidocFilterBlock start=/^\w*\~\{4,}$/ end=/^\w*\~\{4,}$/
 
+"\\ \@<! -> no preceding '\'
+"<< -> two '<' 
+""\{-} -> zero or more ' " '  (double quote)
+"\w \(\w \| -\)* -> any word char, followed by either zero or more words chars or a hyphen
+""\? -> zero or one ' " ' (double quote) as many as possible
+",\? -> zero or one ' , ' (comma) as many as possible
 syn region asciidocMacroAttributes matchgroup=asciidocRefMacro start=/\\\@<!<<"\{-}\w\(\w\|-\)*"\?,\?/ end=/\(>>\)\|^$/ contains=asciidocQuoted.* keepend
+
 syn region asciidocMacroAttributes matchgroup=asciidocAnchorMacro start=/\\\@<!\[\{2}\(\w\|-\)\+,\?/ end=/\]\{2}/ keepend
 syn region asciidocMacroAttributes matchgroup=asciidocAnchorMacro start=/\\\@<!\[\{3}\(\w\|-\)\+/ end=/\]\{3}/ keepend
+
+"[ \\ 0-9a-zA-Z ] \@<!  // zero width negative assertion of these
+"chars can exist, which can't occur before subsequent \w
+"\w \( \w \| - \)*  -> any word char, followed by either zero or more words
+"chars or a hyphen
+": \S \{-} \[/  -> colon, non-whitespace character (as few as possible),
+"opening square bracket
+"skip=/\\\]/  -> skip  \]
+"end=/\]\|^$/  -> end at ] or empty line
 syn region asciidocMacroAttributes matchgroup=asciidocMacro start=/[\\0-9a-zA-Z]\@<!\w\(\w\|-\)*:\S\{-}\[/ skip=/\\\]/ end=/\]\|^$/ contains=asciidocQuoted.* keepend
+
+" \\@<!\\  region \\
 syn region asciidocMacroAttributes matchgroup=asciidocIndexTerm start=/\\\@<!(\{2,3}/ end=/)\{2,3}/ contains=asciidocQuoted.* keepend
 syn region asciidocMacroAttributes matchgroup=asciidocAttributeMacro start=/\({\(\w\|-\)\+}\)\@<=\[/ skip=/\\\]/ end=/\]/ keepend
 
-syn match asciidocCommentLine "^//\([^/].*\|\)$" contains=asciidocToDo
 
+"^// -> two forward slashes at beginning of line
+"\( -> start of grouping
+"[ -> define start of a class/range of chars, from which any *one* can match
+"^/ ->  match any char *except* (negated by '^') a forward slash
+"] -> end of char class
+".* -> any char, zero or more
+"\| -> seperates an alternation match (not sure what the alternate is here)
+"\) -> end of grouping
+"$ -> until end of line
+syn match asciidocCommentLine "^//\([^/].*\|\)$" contains=asciidocToDo
 syn region asciidocAttributeEntry start=/^:\a/ end=/:\(\s\|$\)/ oneline
 
 " Lists.
@@ -129,12 +228,26 @@ syn region asciidocSect4 start=/^=====\s\+\S/ end=/$/ oneline contains=asciidocQ
 syn match asciidocSect0Old /^[^. +/[].*[^.:]\n==\+$/ contains=asciidocQuoted.*,asciidocAttributeRef
 syn match asciidocSect1Old /^[^. +/[].*[^.:]\n--\+$/ contains=asciidocQuoted.*,asciidocAttributeRef
 syn match asciidocSect2Old /^[^. +/[].*[^.:]\n\~\~\+$/ contains=asciidocQuoted.*,asciidocAttributeRef
+
+
+"^ -> start of  line
+"[^. +/[] -> any one of: ^, (any char) space, +, [
+".* -> any char, zero or more, greedy
+"[^.:] -> any one of: ^, (any char), :
+"\n -> newline
+"Section above represents the Section Title
+"^^\+$ -> caret '^' at beginning of line until end of line
 syn match asciidocSect3Old /^[^. +/[].*[^.:]\n^^\+$/ contains=asciidocQuoted.*,asciidocAttributeRef
 syn match asciidocSect4Old /^[^. +/[].*[^.:]\n++\+$/ contains=asciidocQuoted.*,asciidocAttributeRef
 
 "Others
 syn match asciidocReplacements "[\s^]\(\(C\)\|\(TM\)\|\(R\)\|--\|\.\.\.\)[\s$]"
+
+"literal $, wordchar (1+), (':' whitespace, anychar (1+), whitespace )(zero or 1), at end of
+"line
+"$ TEXT: MoreText $
 syn match asciidocRevisionInfo "\$\w\+\(:\s.\+\s\)\?\$"
+
 syn match asciidocBiblio "^\s*+\s\+"
 syn match asciidocSource "^\s\s*\$\s\+.\+$"
 "syn match asciidocSpecialChar "{amp}\w+;"
@@ -157,111 +270,167 @@ syn region asciidocGlossary start="\S" end=":-\s*$" oneline
 "syn match asciidocInclude "sys::\[\]"
 "syn match asciidocInclude "sys2::\[\]"
 
+
+"Boolean
+"Character
+"Comment
+"Conditional
+"Constant
+"Cursor
+"Debug
+"Define
+"Delimiter
+"DiffAdd
+"DiffChange
+"DiffDelete
+"DiffText
+"Directory
+"ErrorMsg
+"Exception
+"Float
+"FoldColumn
+"Folded
+"Function
+"Identifier
+"IncSearch
+"Keyword
+"Label
+"Macro
+"ModeMsg
+"MoreMsg
+"Number
+"Operator
+"PreCondit
+"PreProc
+"Question
+"Repeat
+"Search
+"SpecialChar
+"SpecialComment
+"Special
+"SpecialKey
+"Statement
+"StatusLine
+"StatusLineNC
+"StorageClass
+"String
+"Structure
+"Tag
+"Title
+"Todo
+"Typedef
+"Type
+"Underlined
+"VertSplit
+"VisualNOS
+"WarningMsg
+"WildMenu
+
 "Styles
-highlight asciidocAdmonitionNote term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
-highlight asciidocAdmonitionWarn term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
-highlight asciidocBackslash ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocBiblio term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
-highlight asciidocDoubleDollarPassthrough term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocFootnote term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocGlossary term=underline ctermfg=darkgreen cterm=underline guifg=darkgreen gui=underline
-highlight asciidocHLabel term=underline ctermfg=darkgreen cterm=underline guifg=darkgreen gui=underline
-highlight asciidocInclude term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocQuestion term=underline ctermfg=darkgreen cterm=underline guifg=darkgreen gui=underline
-highlight asciidocQuotedBold term=bold cterm=bold gui=bold
-highlight asciidocQuotedDoubleQuoted term=bold ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuotedEmphasized term=bold ctermfg=darkgreen guifg=darkgreen gui=italic
-highlight asciidocQuotedMonospaced term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuotedUnconstrainedBold term=bold cterm=bold gui=bold
-highlight asciidocQuotedUnconstrainedEmphasized term=bold ctermfg=darkgreen guifg=darkgreen gui=italic
-highlight asciidocQuotedUnconstrainedMonospaced term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuotedSingleQuoted term=bold ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuotedSubscript term=bold ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuotedSuperscript term=bold ctermfg=darkyellow guifg=darkyellow
-highlight asciidocReference term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocReplacements term=standout ctermfg=darkcyan guifg=darkcyan
-highlight asciidocRevisionInfo term=standout ctermfg=blue guifg=darkblue gui=bold
-highlight asciidocSource term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocToDo term=reverse ctermfg=black ctermbg=yellow guifg=black guibg=yellow
-highlight asciidocTripplePlusPassthrough term=underline ctermfg=darkmagenta guifg=darkmagenta
+highlight default link asciidocAdmonitionNote Character 
+highlight default link asciidocAdmonitionWarn Character
+highlight default link asciidocBackslash Comment
+highlight default link asciidocBiblio Constant
+highlight default link asciidocDoubleDollarPassthrough CursorLineNr
+highlight default link asciidocFootnote Define
+highlight default link asciidocGlossary Delimiter
+highlight default link asciidocHLabel DiffAdd
+highlight default link asciidocInclude DiffChange
+highlight default link asciidocQuestion DiffDelete
+highlight default link asciidocQuotedBold Define
+highlight default link asciidocQuotedDoubleQuoted Directory
+highlight default link asciidocQuotedEmphasized Define
+highlight default link asciidocQuotedMonospaced ErrorMsg
+highlight default link asciidocQuotedUnconstrainedBold Float
+highlight default link asciidocQuotedUnconstrainedEmphasized Define
+highlight default link asciidocQuotedUnconstrainedMonospaced NonText
+highlight default link asciidocQuotedSingleQuoted Function
+highlight default link asciidocQuotedSubscript Tag
+highlight default link asciidocQuotedSuperscript Tag
+highlight default link asciidocReference Keyword
+highlight default link asciidocReplacements Label
+highlight default link asciidocRevisionInfo Macro
+highlight default link asciidocSource ModeMsg
+highlight default link asciidocToDo Error
+highlight default link asciidocTriplePlusPassthrough Number
 
 "Attributes
-highlight asciidocAttributeEntry term=standout ctermfg=darkgreen guifg=darkgreen
-highlight asciidocAttributeList term=standout ctermfg=darkgreen guifg=darkgreen
-highlight link asciidocAttributeMacro Macro
-"highlight asciidocAttributeRef term=standout ctermfg=darkgreen cterm=bold guifg=darkgreen gui=bold
-highlight asciidocAttributeRef term=standout,underline ctermfg=darkgreen cterm=bold,underline guifg=darkgreen gui=bold,underline
+highlight default link asciidocAttributeEntry Operator
+highlight default link asciidocAttributeList PreCondit
+highlight default link asciidocAttributeMacro Macro
+"highlight default link asciidocAttributeRef
+highlight default link asciidocAttributeRef PreProc
 
 "Lists
-highlight asciidocListBlockDelimiter term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
-highlight asciidocListBullet term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
-highlight asciidocListContinuation term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
-highlight asciidocListLabel term=underline ctermfg=darkgreen cterm=underline guifg=darkgreen gui=underline
-highlight asciidocListNumber term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
+highlight default link asciidocListBlockDelimiter Question
+highlight default link asciidocListBullet NonText
+highlight default link asciidocListContinuation Search
+highlight default link asciidocListLabel SpecialChar
+highlight default link asciidocListNumber SpecialComment
 
 "Sections
-highlight asciidocSect0 term=bold,underline ctermfg=darkmagenta cterm=bold,underline guifg=darkmagenta gui=bold,underline
-highlight asciidocSect1 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
-highlight asciidocSect2 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
-highlight asciidocSect3 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
-highlight asciidocSect4 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
-highlight asciidocSect0Old term=underline ctermfg=darkmagenta cterm=bold guifg=darkmagenta gui=bold
-highlight asciidocSect1Old term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocSect2Old term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocSect3Old term=underline ctermfg=darkmagenta guifg=darkmagenta
-highlight asciidocSect4Old term=underline ctermfg=darkmagenta guifg=darkmagenta
+highlight default link asciidocSect0 MoreMsg
+highlight default link asciidocSect1 MoreMsg
+highlight default link asciidocSect2 MoreMsg
+highlight default link asciidocSect3 MoreMsg
+highlight default link asciidocSect4 MoreMsg
+highlight default link asciidocSect0Old MoreMsg
+highlight default link asciidocSect1Old MoreMsg
+highlight default link asciidocSect2Old MoreMsg
+highlight default link asciidocSect3Old MoreMsg
+highlight default link asciidocSect4Old MoreMsg
 
 "Links
-highlight asciidocEmail term=underline ctermfg=darkred cterm=underline guifg=darkred gui=underline
-highlight asciidocLink term=underline ctermfg=darkred cterm=underline guifg=darkred gui=underline
-highlight asciidocOneLineTitle ctermfg=darkyellow guifg=darkyellow gui=underline
-highlight asciidocTwoLineTitle ctermfg=darkyellow guifg=darkyellow gui=underline
-highlight asciidocURL term=underline ctermfg=darkred cterm=underline guifg=darkred gui=underline
+highlight default link asciidocEmail Tag
+highlight default link asciidocLink Title
+highlight default link asciidocOneLineTitle Todo
+highlight default link asciidocTwoLineTitle Typedef
+highlight default link asciidocURL Type
 
 "Blocks
-highlight asciidocBlockTitle term=underline ctermfg=darkgreen cterm=underline guifg=darkgreen gui=underline
-highlight asciidocExampleBlockDelimiter term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocFilterBlock term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocListingBlock term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocLiteralBlock term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocLiteralParagraph term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocQuoteBlockDelimiter term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocSidebarDelimiter term=standout ctermfg=darkyellow guifg=darkyellow
+highlight default link asciidocBlockTitle Function
+highlight default link asciidocExampleBlockDelimiter VertSplit
+highlight default link asciidocFilterBlock VisualNOS
+highlight default link asciidocListingBlock Number
+highlight default link asciidocLiteralBlock WildMenu
+highlight default link asciidocLiteralParagraph Normal
+highlight default link asciidocQuoteBlockDelimiter Character
+highlight default link asciidocSidebarDelimiter Conditional
 
 "Tables
-highlight link asciidocTableBlock2 NONE
-highlight link asciidocTableBlock NONE
-highlight asciidocTableDelimiter2 term=standout ctermfg=darkcyan guifg=darkcyan
-highlight asciidocTableDelimiter term=standout ctermfg=darkcyan guifg=darkcyan
-highlight asciidocTable_OLD term=standout ctermfg=darkyellow guifg=darkyellow
-highlight asciidocTablePrefix2 term=standout ctermfg=darkcyan guifg=darkcyan
-highlight asciidocTablePrefix term=standout ctermfg=darkcyan guifg=darkcyan
+highlight default link asciidocTableBlock2 NONE 
+highlight default link asciidocTableBlock NONE 
+highlight default link asciidocTableDelimiter2 Boolean
+highlight default link asciidocTableDelimiter Character
+highlight default link asciidocTable_OLD Comment
+highlight default link asciidocTablePrefix2 Conditional
+highlight default link asciidocTablePrefix Constant
 
 "Comments
-highlight asciidocCommentBlock term=standout ctermfg=darkblue guifg=darkblue
-highlight asciidocCommentLine term=standout ctermfg=darkblue guifg=darkblue
+highlight default link asciidocCommentBlock Comment
+highlight default link asciidocCommentLine Comment
 
 "Macros
-highlight asciidocAnchorMacro term=standout ctermfg=darkred guifg=darkred
-highlight link asciidocIndexTerm Macro
-highlight asciidocMacro term=underline ctermfg=darkred cterm=underline guifg=darkred gui=underline
-highlight asciidocMacroAttributes term=bold ctermfg=darkyellow guifg=darkyellow
-highlight asciidocRefMacro term=standout ctermfg=darkred guifg=darkred
+highlight default link asciidocAnchorMacro SpellCap
+highlight default link asciidocIndexTerm SpellRare
+highlight default link asciidocMacro SpellBad
+highlight default link asciidocMacroAttributes SpellLocal
+highlight default link asciidocRefMacro ColorColumn
 
 "Other
-highlight link asciidocCallout Label
-highlight link asciidocEntityRef Special
-highlight link asciidocIdMarker Special
-highlight link asciidocLineBreak Special
-highlight link asciidocPagebreak Type
-highlight link asciidocPassthroughBlock Identifier
-highlight link asciidocRuler Type
+highlight default link asciidocCallout Label 
+highlight default link asciidocEntityRef Special 
+highlight default link asciidocIdMarker Special 
+highlight default link asciidocLineBreak Special 
+highlight default link asciidocPagebreak Type 
+highlight default link asciidocPassthroughBlock Visual 
+highlight default link asciidocRuler SpecialKey
 
 let b:current_syntax = "asciidoc"
 
 "Show tab and trailing characters
-set listchars=tab:»·,trail:·
-set list
+"set listchars=tab:»·,trail:·
+"set list
 
 "
 "set textwidth=78 formatoptions=tcqn autoindent
