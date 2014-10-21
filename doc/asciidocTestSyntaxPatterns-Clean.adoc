@@ -1,0 +1,629 @@
+AsciiDoc Test Patterns
+======================
+traycerb github
+V1.0, 2014-10-12
+:doctype: book
+:toc:
+:toc-placement: preamble
+
+The PREAMBLE.  This document includes basic info about AsciiDoc formatting, and the respective syntax highlighting command for that syntax in Vim.  Some of the text was taken from the Asciidoctor User Manual:  http://asciidoctor.org/docs/user-manual
+
+The 2nd paragraph of the PREAMBLE.
+
+*Example Syntax:*
+
+*Rendered Appearance*
+
+*Vim Syntax Highlight:*
+
+
+= Header 
+
+== Title
+
+The Header must start on the first line of the document and must begin with a document Title.  The title can be written two ways:
+
+1. Write the title on the first line, followed by '=' signs on the second line equal to the length of the Title.
+
+2. Preceded by one equal sign followed by at least one space (=), and then the text of the title.
+
+*Example Syntax:*
+
+    Title of Document
+    =================
+
+    = Title of Document
+
+*Rendered Appearance:*
+    
+    See top of document
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocSect0 term=bold,underline ctermfg=darkmagenta cterm=bold,underline guifg=darkmagenta gui=bold,underline
+
+== Author
+
+Author and Revision lines immediately follow the title. The author line contains the author's name optionally followed by the author's email address. The email address comes last and must be enclosed in angle <> brackets.
+
+*Example Syntax:*
+
+    FirstName LastName <authorEmailAddr@example.com>
+
+*Rendered Appearance:*
+    
+    See top of document
+
+*Vim Syntax Highlight:*
+
+No special syntax for name.  Syntax for email address is same as for all email addresses.
+
+    highlight asciidocEmail term=underline ctermfg=darkred cterm=underline guifg=darkred gui=underline
+
+
+== Revision
+
+In general, optional revision information line follows the author information line. The revision information can be one of two formats: 
+
+1. An optional document revision number followed by an optional revision date followed by an optional revision remark: If the revision number is specified it must be followed by a comma.  The revision number must contain at least one numeric character.  Any non-numeric characters preceding the first numeric character will be dropped.  If a revision remark is specified it must be preceded by a colon. The revision remark extends from the colon up to the next blank line, attribute entry or comment and is subject to normal text substitutions.  If a revision number or remark has been set but the revision date has not been set then the revision date is set to the value of the docdate attribute.  
+
+2. The revision information line can also be an RCS/CVS/SVN $Id$ marker. 
+
+*Example Syntax:*
+
+    vX.Y, YYYY-MM-DD: Revision remark
+
+    $Id: mydoc.txt,v 1.5 2009/05/17 17:58:44 jbloggs Exp  $
+
+*Rendered Appearance:*
+    
+    See top of document
+
+*Vim Syntax Highlight:*
+
+This syntax rule only works for $ID$ marker-style revision information.
+
+    highlight asciidocRevisionInfo term=standout ctermfg=blue guifg=darkblue gui=bold
+
+
+== Doctype
+
+Specifies document type of the .Adoc.  Options are:
+
+.  Article
+    
+Default. Includes the appendix, abstract, bibliography, glossary, and index sections
+    
+. Book
+
+Same as articles with the additional ability to use a top level title as part titles, includes the appendix, dedication, preface, bibliography, glossary, index, and colophon. 
+
+.  Inline 
+
+There may be cases when you only want to apply inline AsciiDoc formatting to input text without wrapping it in a block element. For example, in the Asciidoclet project (AsciiDoc in Javadoc), only the inline formatting is needed for the text in Javadoc tags.  
+
+*Example Syntax:*
+
+    :doctype: book
+
+*Rendered Appearance:*
+    
+    Not rendered.
+
+*Vim Syntax Highlight:*
+
+    No rule.
+
+== Preamble
+
+The Preamble is an optional untitled section body between the document Header and the first Section title. It may consist of one or several Paragraphs each terminated by a blank line.  When using the default Asciidoctor stylesheet, the lead attribute is applied to the first paragraph of the preamble.
+
+*Example Syntax:*
+
+
+....
+    Title of Document
+    =================
+    vX.Y, YYYY-MM-DD: Revision remark
+    :doctype: book
+
+    The PREAMBLE. 
+
+    The 2nd paragraph of the PREAMBLE.  
+
+    == First Section Title
+....
+
+*Rendered Appearance*
+
+    See top of document
+
+*Vim Syntax Highlight:*
+
+    No rule.
+
+= Sections
+
+== One Line Titles
+
+One line titles consist of a single line delimited by "=" characters.  Trailing "=" are optional.  One line titles offer up to 6 section levels (two line titles only have 5)
+
+*Example Syntax:*
+
+....
+= Document Title (level 0) =
+== Section title (level 1) ==
+=== Section title (level 2) ===
+==== Section title (level 3)
+===== Section title (level 4) =====
+====== Section title (level 5) 
+....
+
+*Rendered Appearance*
+
+= Document Title (level 0) =
+== Section title (level 1) ==
+=== Section title (level 2) ===
+==== Section title (level 3)
+===== Section title (level 4) =====
+====== Section title (level 5) 
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocSect0 term=bold,underline ctermfg=darkmagenta cterm=bold,underline guifg=darkmagenta gui=bold,underline
+
+    highlight asciidocSect1 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
+
+    highlight asciidocSect2 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
+
+    highlight asciidocSect3 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
+
+    highlight asciidocSect4 term=underline ctermfg=darkmagenta cterm=underline guifg=darkmagenta gui=underline
+
+== Two Line Titles
+
+A two line title consists of a title line, starting hard against the left margin, and an underline which spans the width of the preceding title (plus-minus 1 character).  One line titles offer up to 6 section levels (two line titles only have 5).  This format may eventually be deprecated.
+
+*Example Syntax:*
+
+....
+Document Title (level 0)
+========================
+
+Section title (level 1)
+-----------------------
+
+Section title (level 2)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Section title (level 3)
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Section title (level 4)
++++++++++++++++++++++++
+....
+
+*Rendered Appearance*
+
+Document Title (level 0)
+========================
+Section title (level 1)
+-----------------------
+Section title (level 2)
+~~~~~~~~~~~~~~~~~~~~~~~
+Section title (level 3)
+^^^^^^^^^^^^^^^^^^^^^^^
+Section title (level 4)
++++++++++++++++++++++++
+
+*Vim Syntax Highlight:*
+
+highlight asciidocSect0Old term=underline ctermfg=darkmagenta cterm=bold guifg=darkmagenta gui=bold
+
+highlight asciidocSect1Old term=underline ctermfg=darkmagenta guifg=darkmagenta
+
+highlight asciidocSect2Old term=underline ctermfg=darkmagenta guifg=darkmagenta
+
+highlight asciidocSect3Old term=underline ctermfg=darkmagenta guifg=darkmagenta
+
+highlight asciidocSect4Old term=underline ctermfg=darkmagenta guifg=darkmagenta
+
+= Text Formatting
+
+
+== Bold
+
+=== Whole Word(s) Bolding
+
+To bold a word or words (which are delineated by whitespace), place an asterisk (*) at the beginning and end of the text you wish to format. 
+
+*Example Syntax:*
+
+    *This whole sentence is bolded.*
+
+*This whole sentence is bolded.*
+
+    Only one *word* is bolded.
+
+Only one *word* is bolded.
+
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocQuotedBold term=bold cterm=bold gui=bold 
+
+=== Unconstrained Bolding
+
+To bold a letter or letters in a string of text, place two asterisks (**) before and after the letter or letters.
+
+*Example Syntax:*
+
+    Only the **begin**ing of the word is bolded
+
+Only the **begin**ing of the word is bolded
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocQuotedUnconstrainedBold term=bold cterm=bold gui=bold
+
+== Italics
+
+=== Whole Word(s) Italicizing
+
+To italicize a word or words (which are delineated by whitespace), there are 2 options:
+
+1. place a single quote (') at the beginning and end of the text you wish to format. 
+
+2. place a single underscore (_) at the beginning and end of the text you wish to format.  This is similar to Markdown and MS Word, so should be considered preferred.
+
+*Example Syntax:*
+
+    'This whole sentence is italicized.'
+
+'This whole sentence is italicized.'
+
+    Only one 'word' is italicized.
+
+Only one 'word' is italicized.
+
+    _This sentence is also italicized._
+
+_This sentence is also italicized._
+
+    Also just this _word_ is italicized.
+
+Also just this _word_ is italicized.
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocQuotedEmphasized term=bold ctermfg=darkgreen guifg=darkgreen gui=italic
+
+=== Unconstrained Italicizing
+
+To italicize a letter or letters in a string of text, place two underscores (__) before and after the letter or letters.
+
+*Example Syntax:*
+
+    Only the __begin__ing of the word is italicized.
+
+Only the __begin__ing of the word is italicized.
+
+*Vim Syntax Highlight:*
+
+    highlight asciidocQuotedUnconstrainedEmphasized term=bold ctermfg=darkgreen guifg=darkgreen gui=italic
+
+== Monospace
+
+=== Whole word(s) Monospace
+
+Inline content is rendered using a fixed-width font, i.e. monospaced font, when it is enclosed in a single set of backticks (\`). A character bounded by other characters must be enclosed in a double set of backticks (``test``)
+
+*Example Syntax:*
+
+    `This is Monospaced text demarcated by backticks ('\`')` 
+
+`This is Monospaced text demarcated by backticks ('\`')` 
+
+    +This is Monospaced text demarcated by plus signs ('\+') + 
+
++This is Monospaced text demarcated by plus signs ('\+') + 
+
+
+*Vim Syntax Highlight:*
+
+highlight asciidocQuotedMonospaced term=standout ctermfg=darkyellow guifg=darkyellow
+
+=== Unconstrained Monospace
+
+*Example Syntax:*
+
+    Here is unconstrained ++mono++space
+
+Here is unconstrained ++mono++space
+
+*Vim Syntax Highlight:*
+
+highlight asciidocQuotedUnconstrainedMonospaced term=standout ctermfg=darkyellow guifg=darkyellow
+
+== Single Quotation Marks
+
+Phrases enclosed with a single grave accent (\`, aka backtick) to the left and a single acute accent (', aka single quote) to the right are rendered in single quotation marks. 
+
+*Example Syntax:*
+
+    Here is the `right' way to put something in single quotes.
+
+Here is the `right' way to put something in single quotes.
+
+*Vim Syntax Highlight:*
+
+highlight asciidocQuotedSingleQuoted term=bold ctermfg=darkyellow guifg=darkyellow
+
+== Superscripts
+
+Put carets (\^) on either side of the text to be superscripted.
+
+*Example Syntax:*
+
+    Starts off normal, ^and now we're superscripting.^
+
+Starts off normal, ^and now we're superscripting.^
+
+*Vim Syntax Highlight:*
+
+highlight asciidocQuotedSuperscript term=bold ctermfg=darkyellow guifg=darkyellow
+
+== Superscripts
+
+Put tildes (\~) on either side of the text to be subscripted.
+
+*Example Syntax:*
+
+    Starts off normal, ~and now we're subscripting.~
+
+Starts off normal, ~and now we're subscripting.~
+
+*Vim Syntax Highlight:*
+
+highlight asciidocQuotedSubscript term=bold ctermfg=darkyellow guifg=darkyellow
+
+= Block Formatting
+
+== Literal
+
+Literal paragraphs and blocks display the text you write exactly as you enter it. Literal text is treated as preformatted text. The text is shown in a fixed-width font and endlines are preserved
+
+=== Literal sentences
+
+To make a literal sentence or paragraph, indent the first line of the paragraph by one or more spaces
+
+    This is a literal sentence
+   ^ 
+   leading space
+    
+    This is a literal sentence    
+
+*Vim Syntax Highlight:*
+
+highlight asciidocLiteralParagraph term=standout ctermfg=darkyellow guifg=darkyellow
+
+=== Literal Blocks
+
+To make a block of text literal, use the literal block delimiter, four consecutive periods (....)
+
+....
+    ....
+    This sentence is in a literal block.
+    
+    This one too
+    ....
+....
+
+....
+This sentence is in a literal block.
+
+This one too
+....
+
+*Vim Syntax Highlight:*
+
+highlight asciidocLiteralBlock term=standout ctermfg=darkyellow guifg=darkyellow
+
+== Code / Listing Blocks
+
+A delimited listing block is surrounded by lines composed of four hyphens (----).
+
+....
+----
+This is an example of a listing block.
+----
+....
+
+----
+This is an example of a listing block.
+----
+
+*Vim Syntax Highlight:*
+highlight asciidocListingBlock term=standout ctermfg=darkyellow guifg=darkyellow
+
+== Comments
+
+The contents of Comment Blocks/lines are not processed, i.e. the content does not show up in the output document
+
+=== Comment Line
+
+Start line with two forward slashes '//'
+
+    // This line is a comment and won't be in the output document
+
+*Vim Syntax Highlight:*
+
+=== Comments Blocks
+highlight asciidocCommentLine term=standout ctermfg=darkblue guifg=darkblue
+
+A block of comments is started (and ended) by at least four consecutive forward slashes '////' at the start of a line.
+
+    //////////////////////////////////////////
+    CommentBlock contents are not processed by
+    asciidoc.  This won't be in the
+    output document
+    //////////////////////////////////////////
+
+*Vim Syntax Highlight:*
+highlight asciidocCommentBlock term=standout ctermfg=darkblue guifg=darkblue
+
+
+== Examples
+
+=== Example Block
+
+Start and end block with by at least four consecutive equals signs '====' at the start of a line.
+
+....
+    ====
+    This is an example block.
+
+    It continues serving as an example.
+    ====
+....
+
+====
+This is an example block.
+
+It continues serving as an example.
+====
+
+*Vim Syntax Highlight:*
+highlight asciidocExampleBlockDelimiter term=standout ctermfg=darkyellow guifg=darkyellow
+
+
+== Quotes
+
+Set a quote attribute [quote] in brackets before a quote.  No linebreaks will be preserved in the quote itself.
+More attributes describing sources/authors of quote can be added in the [quote] attribute field, seperated by commas
+text leading into the quote can be indicated by adding a line starting with a '.' (period) and followed by the text.  Place this line before the [quote] attribute.
+
+
+=== Single quote
+
+    .The Lead-in to the Quote (Optional)
+    [quote, OptionalAuthorFirst OptionalAuthorLast, OptionalSource]
+    "The quote itself!"
+
+.The Lead-in to the Quote (Optional)
+[quote, OptionalAuthorFirst OptionalAuthorLast, OptionalSource]
+"The quote itself!"
+
+*Vim Syntax Highlight:*
+
+=== Paragraph quote
+
+If the quote or excerpt is more than one paragraph, place the text between delimiter lines consisting of four underscores (__).
+
+....
+    .The Lead-in to the Quote (Optional)
+    [quote, OptionalAuthorFirst OptionalAuthorLast, OptionalSource]
+    ____
+    "Line1 of a quote"
+
+    "line2 of a quote"
+    ____
+....
+
+.The Lead-in to the Quote (Optional)
+[quote, OptionalAuthorFirst OptionalAuthorLast, OptionalSource]
+____
+"Line1 of a quote"
+
+"line2 of a quote"
+____
+
+*Vim Syntax Highlight:*
+highlight asciidocQuoteBlockDelimiter term=standout ctermfg=darkyellow guifg=darkyellow
+
+
+== Lists
+
+If you have adjacent lists, they have the tendency to want to fuse together. To force the lists apart, place a line comment between them (//), offset on either side by a blank line (i.e., an end of list marker).
+
+=== Bulleted lists.
+
+Bulleted list items start with an:
+
+- asterisk(s) (1-5)
+- or a single dash
+- ...followed by a space or tab character, then presumably your text
+
+*Example Syntax:*
+
+
+....
+- A dash bullet 
+
+//
+
+* Bullet level One (1)
+** Bullet level two (2)
+*** Bullet level three (3)
+**** Bullet level four (4)
+***** Bullet level five (5)
+....
+
+- A dash bullet
+
+//
+
+* Bullet level One (1)
+** Bullet level two (2)
+*** Bullet level three (3)
+**** Bullet level four (4)
+***** Bullet level five (5)
+
+*Vim Syntax Highlight:*
+
+highlight asciidocListBullet term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
+
+=== Ordered lists
+
+List item numbers are explicit or implicit.  Explicitly numbered list items begin with a number followed by some white space then the item text. The numbers can be decimal (arabic), roman (upper or lower case) or alpha (upper or lower case). Decimal and alpha numbers are terminated with a period, roman numbers are terminated with a closing parenthesis. The different terminators are necessary to ensure i, v and x roman numbers are are distinguishable from x, v and x alpha numbers.  Implicitly numbered list items begin one to five period characters, followed by some white space then the item text.
+
+*Example Syntax:*
+
+....
+1. number 
+    a. lower-case letter.
+        A. UPPER-CASE LETTER
+            i) lower-case roman 
+                I) UPPER CASE ROMAN
+                . implicity numbering
+
+// Comment lines like this serve as de facto list seperators
+
+. implicit number One (1)
+.. implicit number Two (2)
+... implicit number Three (3)
+.... implicit number Four (4)
+..... implicit number Five (5)
+
+....
+
+1. number 
+    a. lower-case letter.
+        A. UPPER-CASE LETTER
+            i) lower-case roman 
+                I) UPPER CASE ROMAN
+
+// Comment lines like this serve as de facto list seperators
+
+. implicit number One (1)
+.. implicit number Two (2)
+... implicit number Three (3)
+.... implicit number Four (4)
+..... implicit number Five (5)
+
+*Vim Syntax Highlight:*
+
+highlight asciidocListNumber term=bold ctermfg=darkcyan cterm=bold guifg=darkcyan gui=bold
+
+
+// vim: set syntax=asciidoc:

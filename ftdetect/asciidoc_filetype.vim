@@ -6,10 +6,19 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-augroup asciidocFtDetect
-    autocmd BufNewFile,BufRead *.adoc setfiletype asciidoc
-    au BufRead *.txt,*.asc,README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
-augroup END
+autocmd BufNewFile,BufRead *.adoc, *.asc set filetype=asciidoc
+autocmd BufNewFile,BufRead *.txt
+    \ if exists("g:asciidoc_txt_force") |
+    \   set filetype=asciidoc |
+    \ elseif exists("g:asciidoc_txt_guess") |
+    \   call s:FTasciidoc() |
+    \ endif
+au BufNewFile,BufRead README,TODO,NOTES,CHANGELOG
+    \ if exists("g:asciidoc_common_force") |
+    \   set filetype=asciidoc |
+    \ elseif exists("g:asciidoc_common_guess") |
+    \   call s:FTasciidoc() |
+    \ endif
 
 " This function checks for a valid AsciiDoc document title after first
 " skipping any leading comments, looking for a valid asciidoc title.
@@ -43,7 +52,7 @@ function! s:FTasciidoc()
   "check if valid asciidoc title
   if line =~ '^=\s\+\S.*$'
     "single line title style
-    setfiletype asciidoc
+    set filetype = asciidoc
   else
     let lineNext = getline (n)
     let lenLine = len(line)
@@ -52,12 +61,10 @@ function! s:FTasciidoc()
     if ((line =~ '^[^. +/[].*[^.:]$') && (lineNext =~ '^==\+$') &&  (lenDifference > -2 && lenDifference < 2 ))
         "double line title style
         "Delimiter length must be +/-1 compared to title length
-        setfiletype asciidoc
+        set filetype = asciidoc
     endif
   endif
 
-  return
-    
 "    Valid asciidoc title must be >= 3 chars
 "    if line !~ '.\{3,}'
     "    return
