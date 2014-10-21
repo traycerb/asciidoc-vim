@@ -231,9 +231,9 @@ syn match asciidocSect2Old /^[^. +/[].*[^.:]\n\~\~\+$/ contains=asciidocQuoted.*
 
 
 "^ -> start of  line
-"[^. +/[] -> any one of: ^, (any char) space, +, [
+"[^. +/[] -> NOT any one of (all literal): ^ . space / [
 ".* -> any char, zero or more, greedy
-"[^.:] -> any one of: ^, (any char), :
+"[^.:] -> NOT any one of (all literal): . :
 "\n -> newline
 "Section above represents the Section Title
 "^^\+$ -> caret '^' at beginning of line until end of line

@@ -6,18 +6,22 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-
-au BufNewFile,BufRead *.adoc setfiletype asciidoc
-au BufRead *.txt,*.asc,README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
+augroup asciidocFtDetect
+    autocmd BufNewFile,BufRead *.adoc setfiletype asciidoc
+    au BufRead *.txt,*.asc,README,TODO,CHANGELOG,NOTES call s:FTasciidoc()
+augroup END
 
 " This function checks for a valid AsciiDoc document title after first
-" skipping any leading comments.
+" skipping any leading comments, looking for a valid asciidoc title.
 function! s:FTasciidoc()
   let in_comment_block = 0
   let n = 1
+  "Loop moves past opening comment blocks and blank lines
   while n < 50
     let line = getline(n)
     let n = n + 1
+    "Move to next line if in a comment block, until end of comment block
+    "Line beginning and ending with four or more forward slashes '/'
     if line =~ '^/\{4,}$'
       if ! in_comment_block
         let in_comment_block = 1
@@ -29,22 +33,50 @@ function! s:FTasciidoc()
     if in_comment_block
       continue
     endif
+    "Continue searching if line starts with // or is a blank/whitespace line
     if line !~ '\(^//\)\|\(^\s*$\)'
       break
     endif
   endwhile
-  if line !~ '.\{3,}'
-    return
-  endif
-  let len = len(line)
-  let line = getline(n)
-  if line !~ '[-=]\{3,}'
-    return
-  endif
-  if len < len(line) - 3 || len > len(line) + 3
-    return
-  endif
-  setfiletype asciidoc
-endfunction
 
-" vim: et sw=2 ts=2 sts=2:
+  
+  "check if valid asciidoc title
+  if line =~ '^=\s\+\S.*$'
+    "single line title style
+    setfiletype asciidoc
+  else
+    let lineNext = getline (n)
+    let lenLine = len(line)
+    let lenLineNext = len(lineNext)
+    let lenDifference = lenLine - lenLineNext
+    if ((line =~ '^[^. +/[].*[^.:]$') && (lineNext =~ '^==\+$') &&  (lenDifference > -2 && lenDifference < 2 ))
+        "double line title style
+        "Delimiter length must be +/-1 compared to title length
+        setfiletype asciidoc
+    endif
+  endif
+
+  return
+    
+"    Valid asciidoc title must be >= 3 chars
+"    if line !~ '.\{3,}'
+    "    return
+"    endif
+
+"    " 'len' is length of currently stored line (n-1)
+"    let len = len(line)
+"    " 'line' now contains string line (n)
+"    let line = getline(n)
+
+"    "Valid asciidoc title delimiter must match at least 3 '-' or '='
+"    if line !~ '[-=]\{3,}'
+    "    return
+"    endif
+
+     "length of line (n) and (n-1) must be between +/- 3 characters of each
+     "other
+"    if len < len(line) - 3 || len > len(line) + 3
+    "    return
+"    endif
+"    setfiletype asciidoc
+endfunction
