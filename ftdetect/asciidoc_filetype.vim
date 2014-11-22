@@ -48,7 +48,7 @@ function! s:FTasciidoc()
     endif
   endwhile
 
-  
+
   "check if valid asciidoc title
   if line =~ '^=\s\+\S.*$'
     "single line title style
