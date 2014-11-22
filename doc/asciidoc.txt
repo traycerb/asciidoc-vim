@@ -99,6 +99,10 @@ SETTINGS                                                     *AsciiDocSettings*
   Will perform a simple test for files with common names and set syntax as
   'asciidoc' if the file looks like asciidoc
 
+*g:asciidoc_trim*
+
+  Will strip all trailing whitespaces on save
+
 
 ==============================================================================
 FEEDBACK                                                     *AsciiDocFeedback*
