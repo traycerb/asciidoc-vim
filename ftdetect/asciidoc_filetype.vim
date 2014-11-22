@@ -20,6 +20,11 @@ au BufNewFile,BufRead README,TODO,NOTES,CHANGELOG
     \   call s:FTasciidoc() |
     \ endif
 
+autocmd BufWritePre * |
+    \ if b:current_syntax == "asciidoc" && exists("g:asciidoc_trim") |
+    \   %substitute/\s\+$//e |
+    \ endif
+
 " This function checks for a valid AsciiDoc document title after first
 " skipping any leading comments, looking for a valid asciidoc title.
 function! s:FTasciidoc()
