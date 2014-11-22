@@ -6,7 +6,7 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-autocmd BufNewFile,BufRead *.adoc, *.asc set filetype=asciidoc
+autocmd BufNewFile,BufRead *.adoc,*.ad,*.asc set filetype=asciidoc
 autocmd BufNewFile,BufRead *.txt
     \ if exists("g:asciidoc_txt_force") |
     \   set filetype=asciidoc |
