@@ -20,8 +20,7 @@ au BufNewFile,BufRead README,TODO,NOTES,CHANGELOG
     \   call s:FTasciidoc() |
     \ endif
 
-autocmd BufWritePre * |
-    \ if b:current_syntax == "asciidoc" && exists("g:asciidoc_trim") |
+autocmd BufWritePre * if &syntax == "asciidoc" && exists("g:asciidoc_trim") |
     \   %substitute/\s\+$//e |
     \ endif
 
