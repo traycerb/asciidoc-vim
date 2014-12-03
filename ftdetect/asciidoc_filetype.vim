@@ -6,7 +6,7 @@
 " Licence:      GPL (http://www.gnu.org)
 " Remarks:      Vim 6 or greater
 
-autocmd BufNewFile,BufRead *.adoc, *.asc set filetype=asciidoc
+autocmd BufNewFile,BufRead *.adoc,*.ad,*.asc set filetype=asciidoc
 autocmd BufNewFile,BufRead *.txt
     \ if exists("g:asciidoc_txt_force") |
     \   set filetype=asciidoc |
@@ -18,6 +18,10 @@ au BufNewFile,BufRead README,TODO,NOTES,CHANGELOG
     \   set filetype=asciidoc |
     \ elseif exists("g:asciidoc_common_guess") |
     \   call s:FTasciidoc() |
+    \ endif
+
+autocmd BufWritePre * if &syntax == "asciidoc" && exists("g:asciidoc_trim") |
+    \   %substitute/\s\+$//e |
     \ endif
 
 " This function checks for a valid AsciiDoc document title after first
@@ -48,7 +52,7 @@ function! s:FTasciidoc()
     endif
   endwhile
 
-  
+
   "check if valid asciidoc title
   if line =~ '^=\s\+\S.*$'
     "single line title style

@@ -67,7 +67,7 @@ syn match asciidocQuotedSuperscript /\\\@<!\^\(\^\+$\)\@!\S\_.\{-}\(\^\|\n\s*\n\
 "             or . , = - ]
 "+ -> literal plus
 "zero width none of the following: [, <space>, ), \n, \t, ]
-"zero or more (non-greedy) of the following 
+"zero or more (non-greedy) of the following
 " . or
 "   or \n but not followed by \s* \n
 "\S -> non-whitespace
@@ -80,7 +80,7 @@ syn match asciidocQuotedSuperscript /\\\@<!\^\(\^\+$\)\@!\S\_.\{-}\(\^\|\n\s*\n\
 
 "\(
 "    ^\|[| \t([.,=\-\]]
-"\) \@<= 
+"\) \@<=
 "+
 "\(
 "    [ )\n\t]
@@ -106,7 +106,7 @@ syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=+\(+\+$\)\@!\([ )\
 syn match asciidocQuotedMonospaced /\(^\|[| \t([.,=\-\]]\)\@<=`\(`\+$\)\@!\([ )\n\t]\)\@!\(.\|\n\(\s*\n\)\@!\)\{-}\S\(`\([| \t)[\],.?!;:=\-]\|$\)\@=\)/
 
 "[\\+] \@<! > can't start with a literal blackslash and '+'
-"++ \S -> '+'x2 and a non-whitespace character 
+"++ \S -> '+'x2 and a non-whitespace character
 "\_. \{-} -> Any single character or end-of-line, zero or more, non-greedy
 "\( ++ \| \n \s* \n \) end with either '+' x2 or a newline and zero or more white
 "space, and another newline)
@@ -168,7 +168,7 @@ syn region asciidocPassthroughBlock start="^+\{4,}$" end="^+\{4,}$"
 syn region asciidocFilterBlock start=/^\w*\~\{4,}$/ end=/^\w*\~\{4,}$/
 
 "\\ \@<! -> no preceding '\'
-"<< -> two '<' 
+"<< -> two '<'
 ""\{-} -> zero or more ' " '  (double quote)
 "\w \(\w \| -\)* -> any word char, followed by either zero or more words chars or a hyphen
 ""\? -> zero or one ' " ' (double quote) as many as possible
@@ -327,7 +327,7 @@ syn region asciidocGlossary start="\S" end=":-\s*$" oneline
 "WildMenu
 
 "Styles
-highlight default link asciidocAdmonitionNote Character 
+highlight default link asciidocAdmonitionNote Character
 highlight default link asciidocAdmonitionWarn Character
 highlight default link asciidocBackslash Comment
 highlight default link asciidocBiblio Constant
@@ -398,8 +398,8 @@ highlight default link asciidocQuoteBlockDelimiter Character
 highlight default link asciidocSidebarDelimiter Conditional
 
 "Tables
-highlight default link asciidocTableBlock2 NONE 
-highlight default link asciidocTableBlock NONE 
+highlight default link asciidocTableBlock2 NONE
+highlight default link asciidocTableBlock NONE
 highlight default link asciidocTableDelimiter2 Boolean
 highlight default link asciidocTableDelimiter Character
 highlight default link asciidocTable_OLD Comment
@@ -418,12 +418,12 @@ highlight default link asciidocMacroAttributes SpellLocal
 highlight default link asciidocRefMacro ColorColumn
 
 "Other
-highlight default link asciidocCallout Label 
-highlight default link asciidocEntityRef Special 
-highlight default link asciidocIdMarker Special 
-highlight default link asciidocLineBreak Special 
-highlight default link asciidocPagebreak Type 
-highlight default link asciidocPassthroughBlock Visual 
+highlight default link asciidocCallout Label
+highlight default link asciidocEntityRef Special
+highlight default link asciidocIdMarker Special
+highlight default link asciidocLineBreak Special
+highlight default link asciidocPagebreak Type
+highlight default link asciidocPassthroughBlock Visual
 highlight default link asciidocRuler SpecialKey
 
 let b:current_syntax = "asciidoc"
